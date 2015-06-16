@@ -1,4 +1,4 @@
-# wMessage
+# wMessages
 >Fetch whatsapp messages
 
 ###——————————————————————
