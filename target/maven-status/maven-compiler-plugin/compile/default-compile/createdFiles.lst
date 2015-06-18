@@ -1,0 +1,8 @@
+org/wcontacts/main/GetContactsCSV.class
+org/wcontacts/main/GetContacts.class
+org/wcontacts/commons/Commands.class
+org/wcontacts/commons/SendMail.class
+org/wcontacts/commons/Excel.class
+org/wcontacts/commons/Commands$1.class
+org/wcontacts/commons/Csv.class
+org/wcontacts/commons/SendMail$1.class
