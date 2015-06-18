@@ -1,6 +1,6 @@
-/Users/abhishek/Documents/workspace/wContacts/src/main/java/org/wcontacts/commons/SendMail.java
-/Users/abhishek/Documents/workspace/wContacts/src/main/java/org/wcontacts/main/GetContacts.java
-/Users/abhishek/Documents/workspace/wContacts/src/main/java/org/wcontacts/main/GetContactsCSV.java
-/Users/abhishek/Documents/workspace/wContacts/src/main/java/org/wcontacts/commons/Excel.java
-/Users/abhishek/Documents/workspace/wContacts/src/main/java/org/wcontacts/commons/Csv.java
-/Users/abhishek/Documents/workspace/wContacts/src/main/java/org/wcontacts/commons/Commands.java
+/Users/abhishek/Documents/workspace/wMessages/src/main/java/org/wcontacts/commons/Csv.java
+/Users/abhishek/Documents/workspace/wMessages/src/main/java/org/wcontacts/commons/Excel.java
+/Users/abhishek/Documents/workspace/wMessages/src/main/java/org/wcontacts/main/GetContacts.java
+/Users/abhishek/Documents/workspace/wMessages/src/main/java/org/wcontacts/main/GetContactsCSV.java
+/Users/abhishek/Documents/workspace/wMessages/src/main/java/org/wcontacts/commons/SendMail.java
+/Users/abhishek/Documents/workspace/wMessages/src/main/java/org/wcontacts/commons/Commands.java

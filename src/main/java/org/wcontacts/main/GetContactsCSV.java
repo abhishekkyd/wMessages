@@ -109,14 +109,14 @@ public class GetContactsCSV {
 					//"messages.csv");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 			System.out.println(e);
 		} finally {
 			try {
 				fileWriter.flush();
 				fileWriter.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				
 				System.out.println(e);
 			}
 		}

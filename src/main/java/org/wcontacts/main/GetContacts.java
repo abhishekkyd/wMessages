@@ -20,7 +20,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.wcontacts.commons.Commands;
 import org.wcontacts.commons.Excel;
-import org.wcontacts.commons.SendMail;
 
 public class GetContacts {
 
@@ -31,6 +30,7 @@ public class GetContacts {
 	private static FileOutputStream outFile = null;
 	private static WebDriver driver = null;
 	private static WebDriverWait wait = null;
+	private static WebDriverWait wait1 = null;
 	private static Actions act = null;
 	private static JavascriptExecutor js = null;
 	private static List<WebElement> chats = null;
@@ -72,10 +72,11 @@ public class GetContacts {
 			System.setProperty("webdriver.chrome.driver",
 					"drivers/chromedriver");
 			ProfilesIni profile = new ProfilesIni();
-			FirefoxProfile remoteProfile = profile.getProfile("firefox");
+			FirefoxProfile remoteProfile = profile.getProfile("myProfile");
 			driver = new FirefoxDriver(remoteProfile);
 			driver.manage().window().maximize();
 			wait = new WebDriverWait(driver, 60);
+			wait1 = new WebDriverWait(driver, 5);
 			act = new Actions(driver);
 			js = (JavascriptExecutor) driver;
 
@@ -88,6 +89,8 @@ public class GetContacts {
 			Object scrollH = js
 					.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollHeight;");
 			int scrollHeight = Integer.parseInt(scrollH.toString());
+			int scrollEnd = (scrollHeight / 100) * 95;
+			System.out.println(scrollEnd);
 			Object scrollT = js
 					.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
 			int scrollTop = Integer.parseInt(scrollT.toString());
@@ -117,9 +120,17 @@ public class GetContacts {
 									+ messages.size());
 							System.out.println("");
 							for (WebElement msg : messages) {
-								js.executeScript(
-										"arguments[0].scrollTop=arguments[1];",
-										msg, 0);
+								int l = 0;
+								while (l == 5) {
+									js.executeScript(
+											"arguments[0].scrollTop=arguments[1];",
+											msg, 0);
+									Commands.waitUntilElementInvisible(wait1,
+											"//div[@class='btn-more']");
+									Commands.waitUntilElementInvisible(wait,
+											"//div[@class='btn-more']");
+									l++;
+								}
 								message = msg.getText();
 								phoneText = msg.getAttribute("data-reactid");
 								phone = phoneText.split("[a-z]");
@@ -163,7 +174,7 @@ public class GetContacts {
 									rowNum++;
 								}
 							} catch (Exception e) {
-								e.printStackTrace();
+								
 								for (int i = rowNum; i <= sheet.getLastRowNum(); i++) {
 									author = chatTitle;
 									row = Excel.getRow(sheet, row, rowNum);
@@ -175,7 +186,7 @@ public class GetContacts {
 							rowNext = sheet.getLastRowNum() + 2;
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						
 					}
 					scroll = scroll + 1000;
 					js.executeScript("var elem = document.getElementById('pane-side'); elem.scrollTop="
@@ -186,16 +197,19 @@ public class GetContacts {
 					System.out.println("");
 					System.out.println("");
 				} catch (Exception e) {
-					e.printStackTrace();
+					
 				}
-			} while (scrollTop < 1000);
+				if (scrollTop == 0) {
+					break;
+				}
+				System.out.println(scrollTop);
+			} while (scrollTop <= scrollHeight);
 
 			// driver.findElement(By.xpath("//button[@title='Menu']")).click();
 			// driver.findElement(By.xpath("//a[@text='Log out']")).click();
 			// driver.quit();
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			System.out.println(e);
 		} finally {
 			try {
@@ -208,7 +222,7 @@ public class GetContacts {
 				// filepath,
 				// "Messages.xls");
 			} catch (Exception e) {
-				e.printStackTrace();
+				
 				System.out.println(e);
 			}
 		}

@@ -68,7 +68,7 @@ public class SendMail {
 			System.out.println("Email Sent!!");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 			System.out.println(e);
 		}
 	}

@@ -14,7 +14,7 @@ public class Excel {
 				row = sheet.getRow(rowNum);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 			System.out.println(e);
 		}
 		return row;
@@ -29,7 +29,7 @@ public class Excel {
 				cell = row.getCell(cellNum);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 			System.out.println(e);
 		}
 		return cell;
