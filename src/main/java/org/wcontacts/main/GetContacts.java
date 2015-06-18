@@ -3,9 +3,7 @@ package org.wcontacts.main;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -17,6 +15,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.wcontacts.commons.Commands;
@@ -63,9 +62,6 @@ public class GetContacts {
 
 	public static void main(String[] args) {
 
-		Set s = new HashSet();
-		String str = "";
-
 		try {
 			file = new File(filepath);
 			inFile = new FileInputStream(file);
@@ -75,19 +71,18 @@ public class GetContacts {
 
 			System.setProperty("webdriver.chrome.driver",
 					"drivers/chromedriver");
-			File profilepath = new File(System.getProperty("user.dir"),
-					"/profiles/");
-			FirefoxProfile profile = new FirefoxProfile(profilepath);
-			profile.setPreference("browser.tabs.loadInBackground", false);
-			driver = new FirefoxDriver();
+			ProfilesIni profile = new ProfilesIni();
+			FirefoxProfile remoteProfile = profile.getProfile("firefox");
+			driver = new FirefoxDriver(remoteProfile);
 			driver.manage().window().maximize();
 			wait = new WebDriverWait(driver, 60);
 			act = new Actions(driver);
 			js = (JavascriptExecutor) driver;
 
 			driver.get("https://web.whatsapp.com/");
-			Commands.waitForElement(wait, "//div[@class='qrcode']");
-			Commands.waitUntilElementInvisible(wait, "//div[@class='qrcode']");
+			// Commands.waitForElement(wait, "//div[@class='qrcode']");
+			// Commands.waitUntilElementInvisible(wait,
+			// "//div[@class='qrcode']");
 			Commands.waitUntilAllElementsVisible(wait,
 					"//div[@id='side']//div[@class='chat-avatar']");
 			Object scrollH = js
@@ -106,117 +101,94 @@ public class GetContacts {
 					System.out.println("Total number of chats are: "
 							+ chats.size());
 					System.out.println("");
-					for (WebElement chat : chats) {
-						act.moveToElement(chat).build().perform();
-						chat.click();
-						chatTitle = chat.getText();
-						System.out.println("Chat" + chatCount + ": "
-								+ chatTitle);
-						chatCount++;
-						rowNum = rowNext;
-						messages = driver
-								.findElements(By
-										.xpath("//div[@class='bubble bubble-text']//div[@class='message-text']//span[@class='emojitext selectable-text']"));
-						times = driver
-								.findElements(By
-										.xpath("//div[@class='bubble bubble-text']//div[@class='message-meta']//span[@class='message-datetime']"));
-						authors = driver
-								.findElements(By
-										.xpath("//div[@class='bubble bubble-text']//h3[contains(@class,'message-author')]"));
-						int totalMessages = messages.size();
-						System.out.println("Total number of messages are: "
-								+ totalMessages);
-						System.out.println("");
-
-						for (int i = 0; i <= totalMessages; i++) {
-							WebElement msg = messages.get(i);
-							message = msg.getText();
-							phoneText = msg.getAttribute("data-reactid");
-							phone = phoneText.split("[a-z]");
-							phone = phone[9].split("-");
-							phone = phone[1].split("@");
-
-							WebElement tm = times.get(i);
-							time = tm.getText();
+					try {
+						for (WebElement chat : chats) {
+							act.moveToElement(chat).build().perform();
+							chat.click();
+							chatTitle = chat.getText();
+							System.out.println("Chat" + chatCount + ": "
+									+ chatTitle);
+							chatCount++;
+							rowNum = rowNext;
+							messages = driver
+									.findElements(By
+											.xpath("//div[@class='bubble bubble-text']//div[@class='message-text']//span[@class='emojitext selectable-text']"));
+							System.out.println("Total number of messages are: "
+									+ messages.size());
+							System.out.println("");
+							for (WebElement msg : messages) {
+								js.executeScript(
+										"arguments[0].scrollTop=arguments[1];",
+										msg, 0);
+								message = msg.getText();
+								phoneText = msg.getAttribute("data-reactid");
+								phone = phoneText.split("[a-z]");
+								phone = phone[9].split("-");
+								phone = phone[1].split("@");
+								row = Excel.getRow(sheet, row, rowNum);
+								cell1 = Excel.getCell(sheet, row, cell1,
+										cellNum1);
+								cell2 = Excel.getCell(sheet, row, cell2,
+										cellNum2);
+								cell4 = Excel.getCell(sheet, row, cell4,
+										cellNum4);
+								cell1.setCellValue(chatTitle);
+								cell2.setCellValue(phone[0]);
+								cell4.setCellValue(message);
+								rowNum++;
+							}
+							rowNum = rowNext;
+							times = driver
+									.findElements(By
+											.xpath("//div[@class='bubble bubble-text']//div[@class='message-meta']//span[@class='message-datetime']"));
+							for (WebElement tm : times) {
+								time = tm.getText();
+								row = Excel.getRow(sheet, row, rowNum);
+								cell5 = Excel.getCell(sheet, row, cell5,
+										cellNum5);
+								cell5.setCellValue(time);
+								rowNum++;
+							}
 							try {
-								WebElement aut = authors.get(i);
-								author = aut.getText();
+								rowNum = rowNext;
+								authors = driver
+										.findElements(By
+												.xpath("//div[@class='bubble bubble-text']//h3[contains(@class,'message-author')]"));
+								for (WebElement aut : authors) {
+									author = aut.getText();
+									row = Excel.getRow(sheet, row, rowNum);
+									cell3 = Excel.getCell(sheet, row, cell3,
+											cellNum3);
+									cell3.setCellValue(author);
+									rowNum++;
+								}
 							} catch (Exception e) {
 								e.printStackTrace();
-								author = chatTitle;
+								for (int i = rowNum; i <= sheet.getLastRowNum(); i++) {
+									author = chatTitle;
+									row = Excel.getRow(sheet, row, rowNum);
+									cell3 = Excel.getCell(sheet, row, cell3,
+											cellNum3);
+									cell3.setCellValue(author);
+								}
 							}
-							row = Excel.getRow(sheet, row, rowNum);
-							cell1 = Excel.getCell(sheet, row, cell1, cellNum1);
-							cell2 = Excel.getCell(sheet, row, cell2, cellNum2);
-							cell3 = Excel.getCell(sheet, row, cell3, cellNum3);
-							cell4 = Excel.getCell(sheet, row, cell4, cellNum4);
-							cell5 = Excel.getCell(sheet, row, cell5, cellNum5);
-							cell1.setCellValue(chatTitle);
-							cell2.setCellValue(phone[0]);
-							cell3.setCellValue(author);
-							cell4.setCellValue(message);
-							cell5.setCellValue(time);
-							rowNum++;
+							rowNext = sheet.getLastRowNum() + 2;
 						}
-
-//						for (WebElement msg : messages) {
-//							message = msg.getText();
-//							phoneText = msg.getAttribute("data-reactid");
-//							phone = phoneText.split("[a-z]");
-//							phone = phone[9].split("-");
-//							phone = phone[1].split("@");
-//							row = Excel.getRow(sheet, row, rowNum);
-//							cell1 = Excel.getCell(sheet, row, cell1, cellNum1);
-//							cell2 = Excel.getCell(sheet, row, cell2, cellNum2);
-//							cell4 = Excel.getCell(sheet, row, cell4, cellNum4);
-//							cell1.setCellValue(chatTitle);
-//							cell2.setCellValue(phone[0]);
-//							cell4.setCellValue(message);
-//							rowNum++;
-//						}
-//						rowNum = rowNext;
-//						for (WebElement tm : times) {
-//							time = tm.getText();
-//							row = Excel.getRow(sheet, row, rowNum);
-//							cell5 = Excel.getCell(sheet, row, cell5, cellNum5);
-//							cell5.setCellValue(time);
-//							rowNum++;
-//						}
-//						try {
-//							rowNum = rowNext;
-//							for (WebElement aut : authors) {
-//								author = aut.getText();
-//								row = Excel.getRow(sheet, row, rowNum);
-//								cell3 = Excel.getCell(sheet, row, cell3,
-//										cellNum3);
-//								cell3.setCellValue(author);
-//								rowNum++;
-//							}
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//							for (int i = rowNum; i <= sheet.getLastRowNum(); i++) {
-//								author = chatTitle;
-//								row = Excel.getRow(sheet, row, rowNum);
-//								cell3 = Excel.getCell(sheet, row, cell3,
-//										cellNum3);
-//								cell3.setCellValue(author);
-//							}
-//						}
-						rowNext = sheet.getLastRowNum() + 2;
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+					scroll = scroll + 1000;
+					js.executeScript("var elem = document.getElementById('pane-side'); elem.scrollTop="
+							+ scroll + ";");
+					scrollT = js
+							.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
+					scrollTop = Integer.parseInt(scrollT.toString());
+					System.out.println("");
+					System.out.println("");
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.out.println(e);
 				}
-				scroll = scroll + 1000;
-				js.executeScript("var elem = document.getElementById('pane-side'); elem.scrollTop="
-						+ scroll + ";");
-				scrollT = js
-						.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
-				scrollTop = Integer.parseInt(scrollT.toString());
-				System.out.println("");
-				System.out.println("");
-			} while (scrollTop < scrollHeight);
+			} while (scrollTop < 1000);
 
 			// driver.findElement(By.xpath("//button[@title='Menu']")).click();
 			// driver.findElement(By.xpath("//a[@text='Log out']")).click();
