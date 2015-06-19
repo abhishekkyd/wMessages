@@ -20,6 +20,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.wcontacts.commons.Commands;
 import org.wcontacts.commons.Excel;
+import org.wcontacts.commons.SendMail;
 
 public class GetContacts {
 
@@ -236,9 +237,8 @@ public class GetContacts {
 				workbook.write(outFile);
 				outFile.close();
 				workbook.close();
-				// SendMail.sendEmailUsingGmail("wcontacttest@gmail.com",
-				// filepath,
-				// "Messages.xls");
+				SendMail.sendEmailUsingGmail("enter to email address hre",
+						filepath, "Messages.xls");
 			} catch (Exception e) {
 
 				System.out.println(e);
