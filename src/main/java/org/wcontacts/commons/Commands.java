@@ -18,8 +18,6 @@ public class Commands {
 				}
 			});
 		} catch (Exception e) {
-			
-			System.out.println(e);
 		}
 	}
 
@@ -29,8 +27,6 @@ public class Commands {
 			driver.findElement(By.xpath(locator));
 			return true;
 		} catch (Exception e) {
-			
-			System.out.println(e);
 			return false;
 		}
 	}
@@ -41,8 +37,6 @@ public class Commands {
 			wait.until(ExpectedConditions.invisibilityOfElementLocated(By
 					.xpath(locator)));
 		} catch (Exception e) {
-			
-			System.out.println(e);
 		}
 	}
 
@@ -52,8 +46,6 @@ public class Commands {
 			wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By
 					.xpath(locator)));
 		} catch (Exception e) {
-			
-			System.out.println(e);
 		}
 	}
 }

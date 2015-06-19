@@ -89,7 +89,8 @@ public class GetContacts {
 			Object scrollH = js
 					.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollHeight;");
 			int scrollHeight = Integer.parseInt(scrollH.toString());
-			int scrollEnd = (scrollHeight / 100) * 95;
+			System.out.println(scrollHeight);
+			int scrollEnd = (int) ((scrollHeight / 100) * 95);
 			System.out.println(scrollEnd);
 			Object scrollT = js
 					.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
@@ -109,28 +110,26 @@ public class GetContacts {
 							act.moveToElement(chat).build().perform();
 							chat.click();
 							chatTitle = chat.getText();
-							System.out.println("Chat" + chatCount + ": "
-									+ chatTitle);
 							chatCount++;
 							rowNum = rowNext;
+							int l = 0;
+							while (l <= 2) {
+								js.executeScript("var elem = document.getElementById('main'); elem.scrollTop=0;");
+								Commands.waitUntilElementInvisible(wait1,
+										"//div[@class='btn-more']");
+								Commands.waitUntilElementInvisible(wait1,
+										"//div[@class='btn-more']");
+								l++;
+							}
 							messages = driver
 									.findElements(By
 											.xpath("//div[@class='bubble bubble-text']//div[@class='message-text']//span[@class='emojitext selectable-text']"));
+							System.out.println("Chat" + chatCount + ": "
+									+ chatTitle);
 							System.out.println("Total number of messages are: "
 									+ messages.size());
 							System.out.println("");
 							for (WebElement msg : messages) {
-								int l = 0;
-								while (l == 5) {
-									js.executeScript(
-											"arguments[0].scrollTop=arguments[1];",
-											msg, 0);
-									Commands.waitUntilElementInvisible(wait1,
-											"//div[@class='btn-more']");
-									Commands.waitUntilElementInvisible(wait,
-											"//div[@class='btn-more']");
-									l++;
-								}
 								message = msg.getText();
 								phoneText = msg.getAttribute("data-reactid");
 								phone = phoneText.split("[a-z]");
@@ -160,29 +159,29 @@ public class GetContacts {
 								cell5.setCellValue(time);
 								rowNum++;
 							}
-							try {
-								rowNum = rowNext;
-								authors = driver
-										.findElements(By
-												.xpath("//div[@class='bubble bubble-text']//h3[contains(@class,'message-author')]"));
-								for (WebElement aut : authors) {
-									author = aut.getText();
-									row = Excel.getRow(sheet, row, rowNum);
-									cell3 = Excel.getCell(sheet, row, cell3,
-											cellNum3);
-									cell3.setCellValue(author);
-									rowNum++;
-								}
-							} catch (Exception e) {
-								
-								for (int i = rowNum; i <= sheet.getLastRowNum(); i++) {
-									author = chatTitle;
-									row = Excel.getRow(sheet, row, rowNum);
-									cell3 = Excel.getCell(sheet, row, cell3,
-											cellNum3);
-									cell3.setCellValue(author);
-								}
-							}
+//							try {
+//								rowNum = rowNext;
+//								authors = driver
+//										.findElements(By
+//												.xpath("//div[@class='bubble bubble-text']//h3[contains(@class,'message-author')]"));
+//								for (WebElement aut : authors) {
+//									author = aut.getText();
+//									row = Excel.getRow(sheet, row, rowNum);
+//									cell3 = Excel.getCell(sheet, row, cell3,
+//											cellNum3);
+//									cell3.setCellValue(author);
+//									rowNum++;
+//								}
+//							} catch (Exception e) {
+//								
+//								for (int i = rowNum; i <= sheet.getLastRowNum(); i++) {
+//									author = chatTitle;
+//									row = Excel.getRow(sheet, row, rowNum);
+//									cell3 = Excel.getCell(sheet, row, cell3,
+//											cellNum3);
+//									cell3.setCellValue(author);
+//								}
+//							}
 							rowNext = sheet.getLastRowNum() + 2;
 						}
 					} catch (Exception e) {
@@ -194,6 +193,7 @@ public class GetContacts {
 					scrollT = js
 							.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
 					scrollTop = Integer.parseInt(scrollT.toString());
+					System.out.println(scrollTop);
 					System.out.println("");
 					System.out.println("");
 				} catch (Exception e) {
@@ -202,8 +202,7 @@ public class GetContacts {
 				if (scrollTop == 0) {
 					break;
 				}
-				System.out.println(scrollTop);
-			} while (scrollTop <= scrollHeight);
+			} while (scrollTop < scrollHeight-1);
 
 			// driver.findElement(By.xpath("//button[@title='Menu']")).click();
 			// driver.findElement(By.xpath("//a[@text='Log out']")).click();
