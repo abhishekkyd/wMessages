@@ -9,3 +9,10 @@
 ```bash
 mvn clean test
 ```
+
+5. After test execution resultant excel data file is available at:
+
+```bash
+./wMessages/output/Messages.xls
+```
+

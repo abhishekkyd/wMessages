@@ -34,6 +34,8 @@ public class GetContacts {
 	private static Actions act = null;
 	private static JavascriptExecutor js = null;
 	private static List<WebElement> chats = null;
+	private static String[] allMessages = {};
+	private static List<WebElement> aMessages = null;
 	private static List<WebElement> authors = null;
 	private static List<WebElement> messages = null;
 	private static List<WebElement> times = null;
@@ -90,14 +92,16 @@ public class GetContacts {
 					.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollHeight;");
 			int scrollHeight = Integer.parseInt(scrollH.toString());
 			System.out.println(scrollHeight);
-			int scrollEnd = (int) ((scrollHeight / 100) * 95);
+			int scrollEnd = (int) ((scrollHeight / 100) * 93);
 			System.out.println(scrollEnd);
 			Object scrollT = js
 					.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
 			int scrollTop = Integer.parseInt(scrollT.toString());
 			int scroll = 0;
+			int i, j, restart;
 			Thread.sleep(10000);
-			do {
+			startAgain: do {
+				restart = 0;
 				try {
 					chats = driver
 							.findElements(By
@@ -110,9 +114,8 @@ public class GetContacts {
 							act.moveToElement(chat).build().perform();
 							chat.click();
 							chatTitle = chat.getText();
-							chatCount++;
 							rowNum = rowNext;
-							int l = 0;
+							int l = 1;
 							while (l <= 2) {
 								js.executeScript("var elem = document.getElementById('main'); elem.scrollTop=0;");
 								Commands.waitUntilElementInvisible(wait1,
@@ -129,6 +132,7 @@ public class GetContacts {
 							System.out.println("Total number of messages are: "
 									+ messages.size());
 							System.out.println("");
+							chatCount++;
 							for (WebElement msg : messages) {
 								message = msg.getText();
 								phoneText = msg.getAttribute("data-reactid");
@@ -159,50 +163,65 @@ public class GetContacts {
 								cell5.setCellValue(time);
 								rowNum++;
 							}
-//							try {
-//								rowNum = rowNext;
-//								authors = driver
-//										.findElements(By
-//												.xpath("//div[@class='bubble bubble-text']//h3[contains(@class,'message-author')]"));
-//								for (WebElement aut : authors) {
-//									author = aut.getText();
-//									row = Excel.getRow(sheet, row, rowNum);
-//									cell3 = Excel.getCell(sheet, row, cell3,
-//											cellNum3);
-//									cell3.setCellValue(author);
-//									rowNum++;
-//								}
-//							} catch (Exception e) {
-//								
-//								for (int i = rowNum; i <= sheet.getLastRowNum(); i++) {
-//									author = chatTitle;
-//									row = Excel.getRow(sheet, row, rowNum);
-//									cell3 = Excel.getCell(sheet, row, cell3,
-//											cellNum3);
-//									cell3.setCellValue(author);
-//								}
-//							}
+							try {
+								rowNum = rowNext;
+								// aMessages = driver
+								// .findElements(By
+								// .xpath("//div[@class='msg msg-group']"));
+								// i = 0;
+								// for (WebElement m : aMessages) {
+								// allMessages[i] = m.getText();
+								// i++;
+								// }
+								authors = driver
+										.findElements(By
+												.xpath("//div[@class='bubble bubble-text']//h3[contains(@class,'message-author')]"));
+								// i = 0;
+								for (WebElement aut : authors) {
+									author = aut.getText();
+									// if (!allMessages[i].contains(author)) {
+									// rowNum++;
+									// i++;
+									// }
+									row = Excel.getRow(sheet, row, rowNum);
+									cell3 = Excel.getCell(sheet, row, cell3,
+											cellNum3);
+									cell3.setCellValue(author);
+									rowNum++;
+									// i++;
+								}
+							} catch (Exception e) {
+								for (j = rowNum; j <= sheet.getLastRowNum(); j++) {
+									author = chatTitle;
+									row = Excel.getRow(sheet, row, rowNum);
+									cell3 = Excel.getCell(sheet, row, cell3,
+											cellNum3);
+									cell3.setCellValue(author);
+								}
+							}
 							rowNext = sheet.getLastRowNum() + 2;
 						}
+						scroll = scroll + 1000;
+						js.executeScript("var elem = document.getElementById('pane-side'); elem.scrollTop="
+								+ scroll + ";");
+						scrollT = js
+								.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
+						scrollTop = Integer.parseInt(scrollT.toString());
+						System.out.println(scrollTop);
+						System.out.println("");
+						System.out.println("");
 					} catch (Exception e) {
-						
+						restart = 1;
 					}
-					scroll = scroll + 1000;
+				} catch (Exception e) {
+					restart = 1;
+				}
+				if (restart == 1) {
 					js.executeScript("var elem = document.getElementById('pane-side'); elem.scrollTop="
 							+ scroll + ";");
-					scrollT = js
-							.executeScript("var elem = document.getElementById('pane-side'); return elem.scrollTop;");
-					scrollTop = Integer.parseInt(scrollT.toString());
-					System.out.println(scrollTop);
-					System.out.println("");
-					System.out.println("");
-				} catch (Exception e) {
-					
+					continue startAgain;
 				}
-				if (scrollTop == 0) {
-					break;
-				}
-			} while (scrollTop < scrollHeight-1);
+			} while (scrollTop <= scrollEnd);
 
 			// driver.findElement(By.xpath("//button[@title='Menu']")).click();
 			// driver.findElement(By.xpath("//a[@text='Log out']")).click();
@@ -221,7 +240,7 @@ public class GetContacts {
 				// filepath,
 				// "Messages.xls");
 			} catch (Exception e) {
-				
+
 				System.out.println(e);
 			}
 		}
