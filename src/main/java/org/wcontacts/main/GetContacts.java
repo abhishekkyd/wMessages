@@ -116,14 +116,20 @@ public class GetContacts {
 							chat.click();
 							chatTitle = chat.getText();
 							rowNum = rowNext;
-							int l = 1;
-							while (l <= 2) {
-								js.executeScript("var elem = document.getElementById('main'); elem.scrollTop=0;");
-								Commands.waitUntilElementInvisible(wait1,
-										"//div[@class='btn-more']");
-								Commands.waitUntilElementInvisible(wait1,
-										"//div[@class='btn-more']");
-								l++;
+							try {
+								if (System.getProperty("loadPrevious")
+										.equalsIgnoreCase("true")) {
+									int l = 1;
+									while (l <= 2) {
+										js.executeScript("var elem = document.getElementById('main'); elem.scrollTop=0;");
+										Commands.waitUntilElementInvisible(
+												wait1,
+												"//div[@class='btn-more']");
+										l++;
+									}
+								}
+							} catch (Exception e) {
+
 							}
 							messages = driver
 									.findElements(By
@@ -237,8 +243,8 @@ public class GetContacts {
 				workbook.write(outFile);
 				outFile.close();
 				workbook.close();
-				SendMail.sendEmailUsingGmail("enter to email address hre",
-						filepath, "Messages.xls");
+				// SendMail.sendEmailUsingGmail("enter to email address here",
+				// filepath, "Messages.xls");
 			} catch (Exception e) {
 
 				System.out.println(e);
